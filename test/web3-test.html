@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <title>Web3</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script type="text/javascript">
+    var web3 = new Web3('ws://localhost:7545');
+    //web3.eth.getAccounts().then(console.log);
+
+    console.log('ethereum:',window.ethereum);
+
+    const ethEnabled = () => {  
+        if (window.ethereum) {    
+            window.web3 = new Web3(window.ethereum);    
+            window.ethereum.enable();    
+            return true;  
+        } 
+        return false;
+    }
+
+    if (!ethEnabled()) {  alert("Please install an Ethereum-compatible browser or extension like MetaMask to use this dApp!");}
+
+    console.log('default account:'+web3.eth.defaultAccount);
+
+    var contractAddress = '0xf14dd2714e4466e5abebae37df82cd13aed8f280';
+    var abi = [{"constant": false,"inputs": [],"name": "pickWinner","outputs": [],"payable": false,"stateMutability": "nonpayable","type": "function"},{"constant": false,"inputs": [{"name": "fipsId","type": "string"}],"name": "registerArt","outputs": [],"payable": false,"stateMutability": "nonpayable","type": "function"},{"constant": false,"inputs": [{"name": "photographer","type": "address"},{"name": "score","type": "uint256"}],"name": "scoreArt","outputs": [],"payable": false,"stateMutability": "nonpayable","type": "function"},{"inputs": [{"name": "_adjudicators","type": "address[]"},{"name": "_dueTime","type": "uint256"}],"payable": true,"stateMutability": "payable","type": "constructor"},{"constant": true,"inputs": [],"name": "dueTime","outputs": [{"name": "","type": "uint256"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [],"name": "getAllParticipants","outputs": [{"name": "return_participants","type": "address[]"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [],"name": "owner","outputs": [{"name": "","type": "address"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [{"name": "","type": "address"}],"name": "photos","outputs": [{"name": "score","type": "uint256"},{"name": "photographer","type": "address"},{"name": "fipsId","type": "string"},{"name": "adjudicator","type": "address"},{"name": "isRegistered","type": "bool"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [],"name": "reward","outputs": [{"name": "balance","type": "uint256"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [],"name": "winner","outputs": [{"name": "","type": "address"}],"payable": false,"stateMutability": "view","type": "function"}];
+    var photoCompetition = new web3.eth.Contract(abi,contractAddress);
+
+    console.log(photoCompetition.methods);
+
+    photoCompetition.methods.reward().call({}, function(error, result){
+        console.log('reward():',result);
+    });
+
+    photoCompetition.methods.owner().call({}, function(error, result){
+        console.log('owner():',result);
+    });
+
+    photoCompetition.methods.registerArt(123).send({},"111")
+    .then(function(receipt){
+        // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
+        console.log(receipt);
+    });
+
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <title>Photo Competition</title>
+  <script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="common.js"></script>
+</head>
+<body>
+    <h1>Examine</h1>
+    <div id="gallery">
+    </div>
+
+    <script>
+
+      function queryAllPhotos(){
+
+        photoCompetition.methods.getAllParticipants().call({})
+          .then(function(addresses){
+              
+              $.each(addresses, function(index, address) {  
+                console.log(address);
+
+                photoCompetition.methods.photos(address).call({})
+                  .then(function(result){
+                      console.log('result',result);
+
+                      var imgSrc = 'https://tse3.mm.bing.net/th?id=OIP.ZgwEAx_I1bylIJ7GrYM9sAHaHa&pid=Api&P=0&w=300&h=300'
+
+                      if(result.ipfsId != undefined && result.ipfsId != "")
+                        imgSrc = "https://ipfs.io/ipfs/"+result.ipfsId;
+                      //photographer
+                      $photoCard = $("<div style='float:left;text-align: center; padding:2px;'></div>")
+                        .append($('<img id="preview" width="200px;" src="'+ imgSrc +'">'))
+                        .append($('<p>'+result.name+'</p>'))
+                        
+
+                      if(result.adjudicator == "0x0000000000000000000000000000000000000000"){
+                        $photoCard.append($('<input type="text" size="5" name="score" data-address="'+result.photographer+'" placeholder="score">'))
+                                  .append($('<input type="button" value="submit" class="scoreBtn">'));
+                      }else{
+                        $photoCard.append($('<p>'+result.score+'</p>'));
+                      }
+
+                      $photoCard.appendTo($("#gallery"))
+                        
+                      
+                });
+
+              });
+
+
+        });
+      }
+
+      function scorePhoto(photographerAddress, score){
+        photoCompetition.methods.scorePhoto(photographerAddress,score).send({from:web3.givenProvider.selectedAddress})
+          .then(function(receipt){
+              // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
+              console.log(receipt);
+              alert("Score Success.");
+        });
+      }
+
+      $(function() {
+        queryAllPhotos();
+
+        $(document).on('click', '.scoreBtn', function(){ 
+          $score = $(this).parent().find('[name="score"]');
+          var score = $score.val();
+          var photograperAddress = $score.data('address');
+
+          if(score==""){
+            alert("please input score");
+            return;
+          }
+
+          score = parseInt(score, 10);
+          if(score=="" || score < 0 || score > 100){
+            alert("please input score between 0~100");
+            return;
+          }
+
+          alert("click."+score+","+photograperAddress);
+          scorePhoto(photograperAddress, score);
+
+        });
+
+      });
+    </script>
+</body>

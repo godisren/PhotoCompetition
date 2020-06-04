@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <title>Photo Competition</title>
+  <script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="common.js"></script>
+</head>
+<body>
+    <h1>Pick Winner</h1>
+    <input type="button" id="pickBtn" value="pick a winner">
+
+    <script>
+      
+      function pickWinnerAndReward(){
+
+        photoCompetition.methods.pickWinnerAndReward().send({from:web3.givenProvider.selectedAddress})
+          .then(function(receipt){
+                // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
+                console.log(receipt);
+                alert("Score Success.");
+        });
+      }
+
+      $(function() {
+        $("#pickBtn").click(function(){
+          pickWinnerAndReward();
+        });
+      });
+    </script>
+</body>

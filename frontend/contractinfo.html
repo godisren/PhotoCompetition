@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <title>Photo Competition</title>
+  <script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="common.js"></script>
+</head>
+<body>
+    <h1>Contract Info</h1>
+    the winner is <span id="winner"></span>
+    
+    <script>
+      
+      function getInfo(){
+
+        photoCompetition.methods.getWinner().call()
+          .then(function(receipt){
+                $("#winner").text(receipt);
+        });
+      }
+
+      $(function() {
+          getInfo();
+      });
+    </script>
+</body>

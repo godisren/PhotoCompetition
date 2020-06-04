@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <title>Photo Competition</title>
+  <script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="common.js"></script>
+</head>
+<body>
+    <h1>Photo Compeptition</h1>
+    <h2>Register Photo</h2>
+    <form>
+      <input type="file" id="fileinput">
+      <input type="hidden" id="ipfsId" placeholder="ipfsid">
+      <input type="button" id="uploadBtn" value="upload">
+      <input type="text" id="photoName" placeholder="your name">
+      <input type="button" id="registerBtn" value="register">
+    </form>
+    <p>
+      <img id="preview" width="400px" src="">
+    </p>
+
+    <script>
+
+      async function initIPFS(){
+          const node = await Ipfs.create({ repo: 'ipfs-' + Math.random() })
+          window.node = node
+
+          const status = node.isOnline() ? 'online' : 'offline'
+          console.log("Init IPFS:",status);
+        }
+
+      async function uploadFileToIPFS () {
+        var input, file, fr;
+        input = document.getElementById('fileinput');
+
+        file = input.files[0];
+        for await (const { cid } of node.add(file)) {
+          console.log('IPFS cid:', cid)
+          $("#ipfsId").val(cid);
+          $("#preview").attr("src","https://ipfs.io/ipfs/"+cid);
+        }
+      }
+      
+      function registerPhoto(){
+        var ipfsId = $("#ipfsId").val();
+        var name = $("#photoName").val();
+
+        console.log("ipfsId, name", ipfsId, name);
+        console.log("select adddress", web3.givenProvider.selectedAddress);
+
+        photoCompetition.methods.registerPhoto(ipfsId,name).send({from:web3.givenProvider.selectedAddress})
+          .then(function(receipt){
+              // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
+              console.log(receipt);
+              alert("Photo Registeration Success.");
+        });
+      }
+
+      $(function() {
+        initIPFS();
+        
+        $("#uploadBtn").click(function(){
+          uploadFileToIPFS();
+        });
+
+        $("#registerBtn").click(function(){
+          registerPhoto();
+        });
+
+      });
+    </script>
+</body>
